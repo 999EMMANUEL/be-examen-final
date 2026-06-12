@@ -116,13 +116,28 @@ namespace LibraryService.WebAPI
 
 
 
+            // CORS manual — intercepta antes que IIS pueda bloquear la peticion
+            app.Use(async (context, next) =>
+            {
+                context.Response.Headers["Access-Control-Allow-Origin"] = "*";
+                context.Response.Headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS";
+                context.Response.Headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, Accept";
+
+                if (context.Request.Method.ToUpper() == "OPTIONS")
+                {
+                    context.Response.StatusCode = 200;
+                    await context.Response.CompleteAsync();
+                    return;
+                }
+
+                await next();
+            });
+
             using (var scope = app.ApplicationServices.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<LibraryContext>();
                 db.Database.Migrate();
             }
-
-            app.UseCors("Frontend");
 
             app.UseRouting();
 
