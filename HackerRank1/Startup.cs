@@ -122,9 +122,9 @@ namespace LibraryService.WebAPI
                 db.Database.Migrate();
             }
 
-            app.UseRouting();
-
             app.UseCors("Frontend");
+
+            app.UseRouting();
 
             // Agregar los metodos de Auth al Middleware Pipeline.
             app.UseAuthentication();
